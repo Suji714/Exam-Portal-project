@@ -18,28 +18,28 @@ public class ExamService {
 	 @Autowired
 	    private UserService userService;
 	 
-	    public String submitExamResult(String username, boolean passedExam) {
-	        User user = userService.findUser(username);
-	 
-	        if (user == null) {
-	            return "User not found";
-	        }
-	 
-	        if (passedExam) {
-	            // If the user passes the exam, promote the user to the next level
-	            if (user.getLevel() == 3) {
-	                return "Congratulations, you have passed all levels!";
-	            }
-	            user.setLevel(user.getLevel() + 1);
-	            user.setExamStatus(true);
-	            userService.saveUser(user);  // Save the updated user
-	            return "You have been promoted to level " + user.getLevel();
-	        } else {
-	            // If the user fails, reset their level and provide a logout option
-	            user.setLevel(1);  // Reset to level 1
-	            user.setExamStatus(false);
-	            userService.saveUser(user);  // Save the updated user
-	            return "You failed the exam. Please try again. [Logout button available]";
-	        }
-	    }
+//	    public String submitExamResult(String username, boolean passedExam) {
+//	        User user = userService.findUser(username);
+//	 
+//	        if (user == null) {
+//	            return "User not found";
+//	        }
+//	 
+//	        if (passedExam) {
+//	            // If the user passes the exam, promote the user to the next level
+//	            if (user.getLevel() == 3) {
+//	                return "Congratulations, you have passed all levels!";
+//	            }
+//	            user.setLevel(user.getLevel() + 1);
+//	            user.setExamStatus(true);
+//	            userService.saveUser(user);  // Save the updated user
+//	            return "You have been promoted to level " + user.getLevel();
+//	        } else {
+//	            // If the user fails, reset their level and provide a logout option
+//	            user.setLevel(1);  // Reset to level 1
+//	            user.setExamStatus(false);
+//	            userService.saveUser(user);  // Save the updated user
+//	            return "You failed the exam. Please try again. [Logout button available]";
+	        //}
+	    //}
 }
