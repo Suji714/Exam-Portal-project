@@ -1,7 +1,8 @@
 package com.coforge.training.examportal.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,13 +13,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coforge.training.examportal.exception.ResourceNotFoundException;
+import com.coforge.training.examportal.model.AnswerRequest;
 import com.coforge.training.examportal.model.User;
+import com.coforge.training.examportal.model.UserScore;
 import com.coforge.training.examportal.service.ExamService;
 import com.coforge.training.examportal.service.UserService;
 
@@ -65,37 +66,25 @@ public class UserController {
 			return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
 		}
 	}
-
-	//    @PostMapping("/exam/submit")
-	//    public ResponseEntity<?> submitExam(@RequestParam String username, @RequestParam boolean passed) {
-	//        String result = examService.submitExamResult(username, passed);
-	//
-	//        if (result.equals("Congratulations, you have passed all levels!")) {
-	//            return ResponseEntity.ok(result);
-	//        }
-	//
-	//        if (result.contains("You failed the exam")) {
-	//            return ResponseEntity.status(HttpStatus.OK).body(result);
-	//        }
-	//
-	//        return ResponseEntity.status(HttpStatus.OK).body(result);
-	//    }
-
-	//    @PostMapping("/logout")
-	//    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
-	//        return ResponseEntity.status(HttpStatus.OK).body("You have been logged out successfully");
-	//    }
-
-	//    @GetMapping("/{username}")
-	//    public ResponseEntity<?> findByUsername(@PathVariable String username) throws ResourceNotFoundException {
-	//        User user = userService.findUser(username);
-	//        if (user != null) {
-	//            return ResponseEntity.ok(user);
-	//        }
-	//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-	//    }
-
-
+	
+    // Submit answers and calculate/store score
+    @PostMapping("/submit-exam/{topic}")
+    public ResponseEntity<String> submitExam(
+            @RequestParam Long userId,
+            @PathVariable String topic,
+            @RequestBody List<AnswerRequest> answers) {
+ 
+        int score = userService.calculateAndStoreScore(userId, topic, answers);
+        return ResponseEntity.ok("Your score for the " + topic + " exam is: " + score);
+    }
+ 
+    // Retrieve all scores for a user
+    @GetMapping("/scores/{userId}")
+    public ResponseEntity<List<UserScore>> getUserScores(@PathVariable Long userId) {
+    	List<UserScore> scores=userService.getUserScores(userId);
+        return ResponseEntity.ok(scores);
+    }
+    
 	@GetMapping("/")
 	public String welcome() {
 		return "Welcome";
