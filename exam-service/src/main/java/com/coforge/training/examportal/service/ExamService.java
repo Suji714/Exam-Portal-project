@@ -15,33 +15,46 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ExamService {
 
 	@Autowired
-    private ExamQuestionRepository examQuestionRepository;
- 
-    /**
-     * Upload and save questions, assigning unique IDs per topic.
-     */
-    public void saveQuestionsFromJson(MultipartFile file) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<ExamQuestion> questions = objectMapper.readValue(file.getInputStream(), new TypeReference<List<ExamQuestion>>() {});
- 
-        for (ExamQuestion question : questions) {
-            Long nextQuestionId = examQuestionRepository.findMaxQuestionIdByTopic(question.getTopic()) + 1;
-            question.setQuestionId(nextQuestionId); // Assign unique questionId for the topic
-examQuestionRepository.save(question);
-        }
-    }
- 
-    /**
-     * Retrieve questions by topic.
-     */
-    public List<ExamQuestion> getQuestionsByTopic(String topic) {
-        return examQuestionRepository.findByTopic(topic);
-    }
-    
-    public void deleteQuestionsByTopic(String topic) {
-        List<ExamQuestion> questions = examQuestionRepository.findByTopic(topic);
-        if (!questions.isEmpty()) {
-            examQuestionRepository.deleteAll(questions);
-        }
-    }
+	private ExamQuestionRepository examQuestionRepository;
+
+	/**
+	 * Upload and save questions, assigning unique IDs per topic.
+	 */
+	public void saveQuestionsFromJson(MultipartFile file) throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<ExamQuestion> questions = objectMapper.readValue(file.getInputStream(), new TypeReference<List<ExamQuestion>>() {});
+
+		for (ExamQuestion question : questions) {
+			Long nextQuestionId = examQuestionRepository.findMaxQuestionIdByTopic(question.getTopic()) + 1;
+			question.setQuestionId(nextQuestionId); // Assign unique questionId for the topic
+			examQuestionRepository.save(question);
+		}
+	}
+
+	/**
+	 * Retrieve questions by topic.
+	 */
+	public List<ExamQuestion> getQuestionsByTopic(String topic) {
+		return examQuestionRepository.findByTopic(topic);
+	}
+
+	public void deleteQuestionsByTopic(String topic) {
+		List<ExamQuestion> questions = examQuestionRepository.findByTopic(topic);
+		if (!questions.isEmpty()) {
+			examQuestionRepository.deleteAll(questions);
+		}
+	}
+
+
+	/**
+	 * Remove all questions for a given topic.
+	 */
+	public void removeQuestionsByTopic(String topic) {
+		List<ExamQuestion> questions = examQuestionRepository.findByTopic(topic);
+		if (!questions.isEmpty()) {
+			examQuestionRepository.deleteAll(questions);
+		} else {
+			throw new RuntimeException("No questions found for topic: " + topic);
+		}
+	}
 }

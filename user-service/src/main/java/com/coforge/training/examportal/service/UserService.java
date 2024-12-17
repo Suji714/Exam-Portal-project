@@ -32,7 +32,6 @@ public class UserService {
 	private UserRepository userRepository;
 
 
-
 	public UserService(ExamServiceFeignClient examServiceFeignClient, PasswordEncoder passwordEncoder,
 			UserRepository userRepository) {
 		super();
@@ -86,10 +85,8 @@ public class UserService {
 		userScoreRepository.save(userScore);
 	}
 	
-	/*
-	 * get all user scores
-	 */
-	
-	
+	public List<Object[]> getUserReports(Long userId, String firstname){
+		return userRepository.fetchUserReports(userId, firstname);
+	}
 	
 }
