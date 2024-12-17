@@ -20,132 +20,76 @@ import com.coforge.training.examportal.repository.UserScoreRepository;
 public class UserService {
 
 	@Autowired
-	private UserRepository userRepo;
+	private ExamServiceFeignClient examServiceFeignClient;
 
 	@Autowired
 	private final PasswordEncoder passwordEncoder;
 
 	@Autowired
-	private ExamServiceFeignClient examServiceFeignClient;
-
-	@Autowired
 	private UserScoreRepository userScoreRepository;
 
-	//Di using conatructor
-	public UserService(UserRepository userRepo, PasswordEncoder passwordEncoder) {
+	@Autowired
+	private UserRepository userRepository;
+
+
+
+	public UserService(ExamServiceFeignClient examServiceFeignClient, PasswordEncoder passwordEncoder,
+			UserRepository userRepository) {
 		super();
-		this.userRepo = userRepo;
+		this.examServiceFeignClient = examServiceFeignClient;
 		this.passwordEncoder = passwordEncoder;
+		this.userRepository = userRepository;
 	}
 
 	public void saveUser(User user) {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		userRepo.save(user); //save() pre-defined method in JPA repo
+		userRepository.save(user);
 	}
 
-
-	//	public int calculateAndStoreScore(Long userId, String topic, List<AnswerRequest> answers) {
-	//		// Fetch questions for the topic
-	//		List<ExamQuestion> questions = examServiceFeignClient.questionByExamTopic(topic);
-	//
-	//		// Map question IDs to correct options
-	//		Map<Long, String> correctOptions = questions.stream().collect(Collectors.toMap(
-	//				ExamQuestion::getId,
-	//				question -> {
-	//					if (question.getCorrectAnswer().equalsIgnoreCase(question.getOptionA())) return "A";
-	//					if (question.getCorrectAnswer().equalsIgnoreCase(question.getOptionB())) return "B";
-	//					if (question.getCorrectAnswer().equalsIgnoreCase(question.getOptionC())) return "C";
-	//					if (question.getCorrectAnswer().equalsIgnoreCase(question.getOptionD())) return "D";
-	//					return null;
-	//				}
-	//				));
-	//
-	//		// Calculate the score
-	//		int totalScore = 0;
-	//		for (AnswerRequest answer : answers) {
-	//			if (correctOptions.containsKey(answer.getQuestionId()) &&
-	//					((String) correctOptions.get(answer.getQuestionId())).equalsIgnoreCase(answer.getSelectedOption())) {
-	//				totalScore++;
-	//			}
-	//		}
-	//
-	//		// Save the score in the database
-	//		Optional<UserScore> existingScore = userScoreRepository.findByUserIdAndTopic(userId, topic);
-	//		UserScore userScore;
-	//		if (existingScore.isPresent()) {
-	//			userScore = existingScore.get();
-	//			userScore.setScore(totalScore);
-	//		} else {
-	//			userScore = new UserScore();
-	//			userScore.setUserId(userId);
-	//			userScore.setTopic(topic);
-	//			userScore.setScore(totalScore);
-	//		}
-	//		userScoreRepository.save(userScore);
-	//
-	//		return totalScore;
-	//	}
-	//	
-	//	public List<UserScore> getUserScores(Long userId){
-	//		return userScoreRepository.findByUserId(userId);
-	//	}
-
 	/**
-	 * Fetch questions by topic, validate answers, calculate the score, and store it.
+	 * Validate user answers, calculate score, and store it.
 	 */
 	public int calculateAndStoreScore(Long userId, String topic, List<AnswerRequest> answers) {
-		// Fetch all questions for the topic from the ExamService
-		List<ExamQuestion> questions = examServiceFeignClient.questionByExamTopic(topic);
+		List<ExamQuestion> questions = examServiceFeignClient.getQuestionsByTopic(topic);
 
-		// Map each question ID to the correct option (A, B, C, D)
-		Map<Long, String> correctOptions = questions.stream().collect(Collectors.toMap(
-				ExamQuestion::getId,
-				question -> {
-					if (question.getCorrectAnswer().equalsIgnoreCase(question.getOptionA())) return "A";
-					if (question.getCorrectAnswer().equalsIgnoreCase(question.getOptionB())) return "B";
-					if (question.getCorrectAnswer().equalsIgnoreCase(question.getOptionC())) return "C";
-					if (question.getCorrectAnswer().equalsIgnoreCase(question.getOptionD())) return "D";
-					return null;
-				}
-				));
+		// Map question IDs to correct options
+		Map<Long, String> correctOptions = questions.stream()
+				.collect(Collectors.toMap(ExamQuestion::getQuestionId, ExamQuestion::getCorrectAnswer));
 
-		// Calculate the user's score based on their answers
 		int totalScore = 0;
 		for (AnswerRequest answer : answers) {
 			if (correctOptions.containsKey(answer.getQuestionId()) &&
-					correctOptions.get(answer.getQuestionId()).equalsIgnoreCase(answer.getSelectedOption())) {
-				totalScore++; // Increment score for correct answer
+					((String) correctOptions.get(answer.getQuestionId())).equalsIgnoreCase(answer.getSelectedOption())) {
+				totalScore++; // Increment score for correct answers
 			}
 		}
 
-		// Save the user's score for this topic
 		saveUserScore(userId, topic, totalScore);
-
 		return totalScore;
 	}
 
 	/**
-	 * Save or update the user's score for a specific topic.
+	 * Save or update user score.
 	 */
 	private void saveUserScore(Long userId, String topic, int score) {
 		Optional<UserScore> existingScore = userScoreRepository.findByUserIdAndTopic(userId, topic);
 		UserScore userScore;
 		if (existingScore.isPresent()) {
 			userScore = existingScore.get();
-			userScore.setScore(score); // Update existing score
+			userScore.setScore(score);
 		} else {
 			userScore = new UserScore();
 			userScore.setUserId(userId);
 			userScore.setTopic(topic);
-			userScore.setScore(score); // Create new score entry
+			userScore.setScore(score);
 		}
 		userScoreRepository.save(userScore);
 	}
-
-	/**
-	 * Retrieve all scores for a user.
+	
+	/*
+	 * get all user scores
 	 */
-	public List<UserScore> getUserScores(Long userId) {
-		return userScoreRepository.findByUserId(userId);
-	}
+	
+	
+	
 }

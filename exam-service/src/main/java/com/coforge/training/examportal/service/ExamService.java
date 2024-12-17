@@ -15,33 +15,33 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ExamService {
 
 	@Autowired
-	private ExamQuestionRepository examRepo;
-
-	public List<ExamQuestion> getQuestionByExamTopic(String topic) {
-		return examRepo.findByExamTopic(topic);
-	}
-
-	public void saveQuestionsFromJson(MultipartFile file) throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
-
-		// Parse JSON file
-		List<ExamQuestion> questions = objectMapper.readValue(file.getInputStream(), new TypeReference<List<ExamQuestion>>() {});
-
-		// Validate and save each question
-		for (ExamQuestion question : questions) {
-			if (isValidQuestion(question)) {
-				examRepo.save(question);
-			} else {
-				throw new IllegalArgumentException("Invalid question format for ID: " + question.getId());
-			}
-		}
-	}
-
-	private boolean isValidQuestion(ExamQuestion question) {
-		// Basic validation logic for question format
-		return question.getQuestion() != null && !question.getQuestion().isEmpty()
-				&& question.getCorrectAnswer() != null && !question.getCorrectAnswer().isEmpty()
-				&& question.getOptionA() != null && question.getOptionB() != null
-				&& question.getOptionC() != null && question.getOptionD() != null;
-	}
+    private ExamQuestionRepository examQuestionRepository;
+ 
+    /**
+     * Upload and save questions, assigning unique IDs per topic.
+     */
+    public void saveQuestionsFromJson(MultipartFile file) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ExamQuestion> questions = objectMapper.readValue(file.getInputStream(), new TypeReference<List<ExamQuestion>>() {});
+ 
+        for (ExamQuestion question : questions) {
+            Long nextQuestionId = examQuestionRepository.findMaxQuestionIdByTopic(question.getTopic()) + 1;
+            question.setQuestionId(nextQuestionId); // Assign unique questionId for the topic
+examQuestionRepository.save(question);
+        }
+    }
+ 
+    /**
+     * Retrieve questions by topic.
+     */
+    public List<ExamQuestion> getQuestionsByTopic(String topic) {
+        return examQuestionRepository.findByTopic(topic);
+    }
+    
+    public void deleteQuestionsByTopic(String topic) {
+        List<ExamQuestion> questions = examQuestionRepository.findByTopic(topic);
+        if (!questions.isEmpty()) {
+            examQuestionRepository.deleteAll(questions);
+        }
+    }
 }

@@ -21,24 +21,28 @@ import com.coforge.training.examportal.service.ExamService;
 @RequestMapping("/api/exam")
 public class ExamController {
 	
-	@Autowired
+    @Autowired
     private ExamService examService;
  
-    @GetMapping("/question/{examTopic}")
-    public ResponseEntity<List<ExamQuestion>> questionByExamTopic(@PathVariable String examTopic) {
-        return ResponseEntity.ok(examService.getQuestionByExamTopic(examTopic));
-    }
-  
-     
-        @PostMapping("/uploadquestions")
-        public ResponseEntity<String> uploadQuestions(@RequestParam("file") MultipartFile file) {
-            try {
-                examService.saveQuestionsFromJson(file);
-                return ResponseEntity.ok("Questions uploaded and saved successfully!");
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
-            }
+    /**
+     * Upload questions from a JSON file.
+     */
+    @PostMapping("/upload-questions")
+    public ResponseEntity<String> uploadQuestions(@RequestParam("file") MultipartFile file) {
+        try {
+            examService.saveQuestionsFromJson(file);
+            return ResponseEntity.ok("Questions uploaded successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
-    
+    }
+ 
+    /**
+     * Get questions by topic.
+     */
+    @GetMapping("/questions/{topic}")
+    public ResponseEntity<List<ExamQuestion>> getQuestionsByTopic(@PathVariable String topic) {
+        return ResponseEntity.ok(examService.getQuestionsByTopic(topic));
+    }
      
 }

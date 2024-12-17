@@ -7,7 +7,6 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,7 +17,7 @@ import lombok.Data;
 @Entity
 @Data
 public class User implements UserDetails{
-	
+
 	/**
 	 * 
 	 */
@@ -28,14 +27,11 @@ public class User implements UserDetails{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name = "Fullname")
-	private String username;
+	private String firstname;
+	
+	private String lastname;
 	
 	private String password;
-	
-	private int level;
-	
-	private String role;
 	
 	private String email;
 	
@@ -54,6 +50,13 @@ public class User implements UserDetails{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String getUsername() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 
 }

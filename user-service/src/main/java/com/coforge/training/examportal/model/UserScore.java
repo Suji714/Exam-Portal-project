@@ -14,7 +14,10 @@ public class UserScore {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
  
-    private Long userId; // Foreign key to User
+    private Long userId;
     private String topic;
     private int score;
+ 
+    // Getters and setters
+    // ...
 }

@@ -3,8 +3,6 @@ package com.coforge.training.examportal.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.coforge.training.examportal.model.User;
-
 /*
 * Author      : Satyam.3.Singh
 * Date        : 12:48:14 pm

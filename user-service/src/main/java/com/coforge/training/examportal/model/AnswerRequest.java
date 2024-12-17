@@ -5,9 +5,7 @@ import lombok.Data;
 @Data
 public class AnswerRequest {
 	
-	private Long questionId;
-	
-	private String selectedOption;
-	
+	private Long questionId; // Question ID
+    private String selectedOption; // User-selected option (A, B, C, D)
 	
 }
