@@ -9,17 +9,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "user-service")
 public interface UserServiceClient {
  
+	//To fetch reports of all users by the admin
     @GetMapping("api/user/reports")
     List<Object[]> fetchUserReports(@RequestParam(required = false) Long userId,
                                     @RequestParam(required = false) String firstname);
     
-    
-// // Endpoint to view reports
-//    @GetMapping("/reports")
-//    public List<Object[]> getUserReports(
-//            @RequestParam(required = false) Long userId,
-//            @RequestParam(required = false) String firstname) {
-//        return userService.getUserReports(userId, firstname);
-//    }
  
 }

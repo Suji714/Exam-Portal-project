@@ -40,8 +40,16 @@ public class UserService {
 		this.userRepository = userRepository;
 	}
 
-	public void saveUser(User user) {
+	//to save the user detials with password encyption
+	public void saveUser(User user) throws Exception {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		
+		if (userRepository.existsByEmail(user.getEmail())) {
+            throw new Exception("Email already exists");
+        }
+        if (userRepository.existsByMobile(user.getMobile())) {
+            throw new Exception("Mobile number already exists");
+        }
 		userRepository.save(user);
 	}
 
@@ -85,8 +93,17 @@ public class UserService {
 		userScoreRepository.save(userScore);
 	}
 	
+	//for admin to fetch all user details with marks 
+	
 	public List<Object[]> getUserReports(Long userId, String firstname){
 		return userRepository.fetchUserReports(userId, firstname);
 	}
+	
+	 /**
+     * Retrieve all scores for a user across all topics.
+     */
+    public List<UserScore> getUserScores(Long userId) {
+        return userScoreRepository.findByUserId(userId);
+    }
 	
 }

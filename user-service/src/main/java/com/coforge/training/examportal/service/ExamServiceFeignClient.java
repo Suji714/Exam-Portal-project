@@ -15,17 +15,16 @@ import com.coforge.training.examportal.model.ExamQuestion;
 @FeignClient(name = "exam-service")
 public interface ExamServiceFeignClient {
 
+	//get exam questions by topic
 	@GetMapping("/api/exam/questions/{topic}")
 	public List<ExamQuestion> getQuestionsByTopic(@PathVariable String topic);
 
-//	public void uploadQuestions(MultipartFile file);
-
-//	public ExamQuestion getQuestionById(Long questionId);
 	
+	//upload questions in json file by admin
 	@PostMapping(value = "/api/exam/upload-questions", consumes = "multipart/form-data")
     void uploadQuestions(@RequestParam("file") MultipartFile file);
  
-	
+	//delete questions based on the topic
     @DeleteMapping("/api/exam/delete-questions/{topic}")
     void deleteQuestionsByTopic(@PathVariable String topic);
 

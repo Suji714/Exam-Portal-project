@@ -26,7 +26,8 @@ public class SecurityConfig {
 		return new BCryptPasswordEncoder();
 	}
 
-
+	// security filter chain
+	@SuppressWarnings("removal")
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http

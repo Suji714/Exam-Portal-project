@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +29,7 @@ public class AdminController {
 	 * Add questions via a JSON file.
 	 */
 	@PostMapping("/add-questions")
-	public ResponseEntity<String> addQuestions(@RequestParam MultipartFile file) {
+	public ResponseEntity<String> addQuestions(@RequestPart("file") MultipartFile file) {
 		try {
 			adminService.addQuestions(file);
 			return ResponseEntity.ok("Questions uploaded successfully!");

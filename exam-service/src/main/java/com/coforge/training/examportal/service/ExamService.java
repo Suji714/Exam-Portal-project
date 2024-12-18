@@ -18,7 +18,7 @@ public class ExamService {
 	private ExamQuestionRepository examQuestionRepository;
 
 	/**
-	 * Upload and save questions, assigning unique IDs per topic.
+	 * Upload and save questions, assigning unique IDs per topic. from JSON file by Admin
 	 */
 	public void saveQuestionsFromJson(MultipartFile file) throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -36,13 +36,6 @@ public class ExamService {
 	 */
 	public List<ExamQuestion> getQuestionsByTopic(String topic) {
 		return examQuestionRepository.findByTopic(topic);
-	}
-
-	public void deleteQuestionsByTopic(String topic) {
-		List<ExamQuestion> questions = examQuestionRepository.findByTopic(topic);
-		if (!questions.isEmpty()) {
-			examQuestionRepository.deleteAll(questions);
-		}
 	}
 
 

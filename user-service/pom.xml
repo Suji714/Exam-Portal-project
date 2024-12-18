@@ -84,6 +84,13 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- Dependency for Swagger3
+ 	Swagger is a REST-API documentation Tool-->
+		<dependency>
+    		<groupId>org.springdoc</groupId>
+    		<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    		<version>2.0.2</version>
+	</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

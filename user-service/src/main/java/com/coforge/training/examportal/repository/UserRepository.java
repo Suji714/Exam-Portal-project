@@ -14,7 +14,12 @@ import feign.Param;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>{
 
-
+	User findByEmail(String email);
+	
+	 boolean existsByEmail(String email);
+	 
+	 boolean existsByMobile(String mobile);
+	
 	// Find users by name (case-insensitive)
 	List<User> findByFirstnameContainingOrId(String firstname, Long id);
 
