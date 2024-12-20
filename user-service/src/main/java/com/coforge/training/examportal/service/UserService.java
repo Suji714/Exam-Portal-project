@@ -66,7 +66,7 @@ public class UserService {
 		int totalScore = 0;
 		for (AnswerRequest answer : answers) {
 			if (correctOptions.containsKey(answer.getQuestionId()) &&
-					((String) correctOptions.get(answer.getQuestionId())).equalsIgnoreCase(answer.getSelectedOption())) {
+					( correctOptions.get(answer.getQuestionId())).equalsIgnoreCase(answer.getSelectedOption())) {
 				totalScore++; // Increment score for correct answers
 			}
 		}

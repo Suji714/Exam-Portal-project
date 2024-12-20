@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import com.coforge.training.examportal.model.UserScore;
 import com.coforge.training.examportal.repository.UserRepository;
 import com.coforge.training.examportal.service.UserService;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -46,6 +48,7 @@ public class UserController {
 	    
 	    
 	    // Authenticate User login
+	    // http://localhost:8083/api/user/login
 	    @PostMapping("/login")
 	    public ResponseEntity<String> authenticateUser(@RequestBody User loginRequest) {
 	        User user = userRepository.findByEmail(loginRequest.getEmail());
@@ -87,5 +90,5 @@ public class UserController {
 	        return ResponseEntity.ok(userScores);
 	    }
 	 
-
+	    
 }
