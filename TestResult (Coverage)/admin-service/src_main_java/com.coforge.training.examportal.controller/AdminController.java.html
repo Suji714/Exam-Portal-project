@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>AdminController.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">admin-service (20 Dec 2024 10:52:56 am)</a> &gt; <a href="../../index.html" class="el_group">admin-service</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">com.coforge.training.examportal.controller</a> &gt; <span class="el_source">AdminController.java</span></div><h1>AdminController.java</h1><pre class="source lang-java linenums">package com.coforge.training.examportal.controller;
+
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.coforge.training.examportal.service.AdminService;
+
+@CrossOrigin(origins = &quot;http://localhost:4200&quot;)
+@RestController
+@RequestMapping(&quot;/api/admin&quot;)
+<span class="fc" id="L25">public class AdminController {</span>
+
+	@Autowired
+	private AdminService adminService;
+
+	/**
+	 * Add questions via a JSON file.
+	 */
+	@PostMapping(&quot;/add-questions&quot;)
+	public ResponseEntity&lt;String&gt; addQuestions(@RequestPart(&quot;file&quot;) MultipartFile file) {
+		try {
+<span class="fc" id="L36">			adminService.addQuestions(file);</span>
+<span class="fc" id="L37">			return ResponseEntity.ok(&quot;Questions uploaded successfully!&quot;);</span>
+<span class="fc" id="L38">		} catch (Exception e) {</span>
+<span class="fc" id="L39">			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(&quot;Error: &quot; + e.getMessage());</span>
+		}
+	}
+
+	/**
+	 * Remove questions by topic.
+	 */
+	@DeleteMapping(&quot;/remove-questions/{topic}&quot;)
+	public ResponseEntity&lt;String&gt; removeQuestions(@PathVariable String topic) {
+<span class="fc" id="L48">		adminService.removeQuestionsByTopic(topic);</span>
+<span class="fc" id="L49">		return ResponseEntity.ok(&quot;Questions for topic '&quot; + topic + &quot;' removed successfully!&quot;);</span>
+	}
+	
+	  // Endpoint for admin to view reports
+    @GetMapping(&quot;/view-reports&quot;)
+    public List&lt;Object[]&gt; viewReports(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String firstname) {
+<span class="fc" id="L57">        return adminService.viewUserReports(userId, firstname);</span>
+    }
+   
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>admin-service (20 Dec 2024 10:52:56 am)</div></body></html>

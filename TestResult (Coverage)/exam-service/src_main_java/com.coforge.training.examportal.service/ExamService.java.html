@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ExamService.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">exam-service (21 Dec 2024 10:48:12 am)</a> &gt; <a href="../../index.html" class="el_group">exam-service</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">com.coforge.training.examportal.service</a> &gt; <span class="el_source">ExamService.java</span></div><h1>ExamService.java</h1><pre class="source lang-java linenums">package com.coforge.training.examportal.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.coforge.training.examportal.model.ExamQuestion;
+import com.coforge.training.examportal.repository.ExamQuestionRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@Service
+<span class="fc" id="L15">public class ExamService {</span>
+
+	@Autowired
+	private ExamQuestionRepository examQuestionRepository;
+
+	/**
+	 * Upload and save questions, assigning unique IDs per topic. from JSON file by Admin
+	 */
+	public void saveQuestionsFromJson(MultipartFile file) throws Exception {
+<span class="fc" id="L24">		ObjectMapper objectMapper = new ObjectMapper(); </span>
+<span class="fc" id="L25">		List&lt;ExamQuestion&gt; questions = objectMapper.readValue(file.getInputStream(), new TypeReference&lt;List&lt;ExamQuestion&gt;&gt;() {});</span>
+
+<span class="fc bfc" id="L27" title="All 2 branches covered.">		for (ExamQuestion question : questions) {</span>
+<span class="fc" id="L28">			Long nextQuestionId = examQuestionRepository.findMaxQuestionIdByTopic(question.getTopic()) + 1;</span>
+<span class="fc" id="L29">			question.setQuestionId(nextQuestionId); // Assign unique questionId for the topic</span>
+<span class="fc" id="L30">			examQuestionRepository.save(question);</span>
+		}
+<span class="fc" id="L32">	}</span>
+
+	/**
+	 * Retrieve questions by topic.
+	 */
+	public List&lt;ExamQuestion&gt; getQuestionsByTopic(String topic) {
+<span class="fc" id="L38">		return examQuestionRepository.findByTopic(topic);</span>
+	}
+
+
+	/**
+	 * Remove all questions for a given topic.
+	 */
+	public void removeQuestionsByTopic(String topic) {
+<span class="fc" id="L46">		List&lt;ExamQuestion&gt; questions = examQuestionRepository.findByTopic(topic);</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">		if (!questions.isEmpty()) {</span>
+<span class="fc" id="L48">			examQuestionRepository.deleteAll(questions);</span>
+<span class="fc" id="L49">		} else {</span>
+<span class="fc" id="L50">			throw new RuntimeException(&quot;No questions found for topic: &quot; + topic);</span>
+		}
+<span class="fc" id="L52">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>exam-service (21 Dec 2024 10:48:12 am)</div></body></html>

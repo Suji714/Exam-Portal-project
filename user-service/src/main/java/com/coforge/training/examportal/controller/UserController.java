@@ -1,6 +1,9 @@
 package com.coforge.training.examportal.controller;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,15 +52,20 @@ public class UserController {
 	    
 	    // Authenticate User login
 	    // http://localhost:8083/api/user/login
+	    // Authenticate User login
 	    @PostMapping("/login")
-	    public ResponseEntity<String> authenticateUser(@RequestBody User loginRequest) {
+	    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody User loginRequest) {
 	        User user = userRepository.findByEmail(loginRequest.getEmail());
 	        if (user != null && passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-	            return ResponseEntity.ok("Login successful!");
+	            Map<String, Object> response = new HashMap<>();
+	            response.put("message", "Login successful!");
+	            response.put("userId", user.getId());
+	            return ResponseEntity.ok(response); 
 	        } else {
-	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials!");
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("message", "Invalid credentials!"));
 	        }
 	    }
+ 
 	 
 	
 	 //submit exam based on topic after users click submit
@@ -77,7 +85,7 @@ public class UserController {
 	    public List<Object[]> getUserReports(
 	            @RequestParam(required = false) Long userId,
 	            @RequestParam(required = false) String firstname) {
-	        return userService.getUserReports(userId, firstname);
+	        return userService.getUserReports(userId, firstname); 
 	    }
 	    
 	    

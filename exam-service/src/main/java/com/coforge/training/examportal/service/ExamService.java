@@ -21,7 +21,7 @@ public class ExamService {
 	 * Upload and save questions, assigning unique IDs per topic. from JSON file by Admin
 	 */
 	public void saveQuestionsFromJson(MultipartFile file) throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = new ObjectMapper(); 
 		List<ExamQuestion> questions = objectMapper.readValue(file.getInputStream(), new TypeReference<List<ExamQuestion>>() {});
 
 		for (ExamQuestion question : questions) {

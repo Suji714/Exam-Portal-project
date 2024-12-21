@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ExamServiceTest1.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">exam-service (21 Dec 2024 10:48:12 am)</a> &gt; <a href="../../index.html" class="el_group">exam-service</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.coforge.training.examportal</a> &gt; <span class="el_source">ExamServiceTest1.java</span></div><h1>ExamServiceTest1.java</h1><pre class="source lang-java linenums">package com.coforge.training.examportal;
+
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.coforge.training.examportal.controller.ExamController;
+import com.coforge.training.examportal.model.ExamQuestion;
+import com.coforge.training.examportal.service.ExamService;
+
+@ExtendWith(MockitoExtension.class)
+@WebMvcTest(ExamController.class)
+<span class="fc" id="L34">public class ExamServiceTest1 {</span>
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private ExamService examService;
+
+    @InjectMocks
+    private ExamController examController;
+
+    @BeforeEach
+    public void setup() {
+<span class="fc" id="L47">        mockMvc = MockMvcBuilders.standaloneSetup(examController).build();</span>
+<span class="fc" id="L48">    }</span>
+
+    @Test
+    public void testUploadQuestions() throws Exception {
+<span class="fc" id="L52">        MockMultipartFile file = new MockMultipartFile(&quot;file&quot;, &quot;questions.json&quot;, &quot;application/json&quot;, &quot;{\&quot;questions\&quot;:[]}&quot;.getBytes());</span>
+
+<span class="fc" id="L54">        doNothing().when(examService).saveQuestionsFromJson(file);</span>
+
+<span class="fc" id="L56">        mockMvc.perform(multipart(&quot;/api/exam/add-questions&quot;)</span>
+<span class="fc" id="L57">                .file(file)</span>
+<span class="fc" id="L58">                .contentType(MediaType.MULTIPART_FORM_DATA))</span>
+<span class="fc" id="L59">                .andExpect(status().isOk())</span>
+<span class="fc" id="L60">                .andExpect(content().string(&quot;Questions uploaded successfully!&quot;));</span>
+<span class="fc" id="L61">    }</span>
+
+    @Test
+    public void testGetQuestionsByTopic() throws Exception {
+<span class="fc" id="L65">    	String topic = &quot;Java&quot;;</span>
+<span class="fc" id="L66">        ExamQuestion question1 = new ExamQuestion();</span>
+<span class="fc" id="L67">        question1.setQuestion(&quot;What is Java?&quot;);</span>
+<span class="fc" id="L68">        question1.setCorrectAnswer(&quot;Java is a programming language.&quot;);</span>
+
+<span class="fc" id="L70">        ExamQuestion question2 = new ExamQuestion();</span>
+<span class="fc" id="L71">        question2.setQuestion(&quot;What is JVM?&quot;);</span>
+<span class="fc" id="L72">        question2.setCorrectAnswer(&quot;JVM stands for Java Virtual Machine.&quot;);</span>
+
+<span class="fc" id="L74">        List&lt;ExamQuestion&gt; questions = Arrays.asList(question1, question2);</span>
+
+<span class="fc" id="L76">        when(examService.getQuestionsByTopic(topic)).thenReturn(questions);</span>
+
+<span class="fc" id="L78">        mockMvc.perform(get(&quot;/api/exam/questions/{topic}&quot;, topic)</span>
+<span class="fc" id="L79">                .contentType(MediaType.APPLICATION_JSON))</span>
+<span class="fc" id="L80">                .andExpect(status().isOk())</span>
+<span class="fc" id="L81">                .andExpect(jsonPath(&quot;$[0].question&quot;).value(&quot;What is Java?&quot;))</span>
+<span class="fc" id="L82">                .andExpect(jsonPath(&quot;$[0].correctAnswer&quot;).value(&quot;Java is a programming language.&quot;))</span>
+<span class="fc" id="L83">                .andExpect(jsonPath(&quot;$[1].question&quot;).value(&quot;What is JVM?&quot;))</span>
+<span class="fc" id="L84">                .andExpect(jsonPath(&quot;$[1].correctAnswer&quot;).value(&quot;JVM stands for Java Virtual Machine.&quot;));</span>
+<span class="fc" id="L85">    }</span>
+
+    @Test
+    public void testRemoveQuestionsByTopic() throws Exception {
+<span class="fc" id="L89">        String topic = &quot;Java&quot;;</span>
+
+<span class="fc" id="L91">        doNothing().when(examService).removeQuestionsByTopic(topic);</span>
+
+<span class="fc" id="L93">        mockMvc.perform(delete(&quot;/api/exam/remove-questions/{topic}&quot;, topic)</span>
+<span class="fc" id="L94">                .contentType(MediaType.APPLICATION_JSON))</span>
+<span class="fc" id="L95">                .andExpect(status().isOk())</span>
+<span class="fc" id="L96">                .andExpect(content().string(&quot;Questions for topic '&quot; + topic + &quot;' removed successfully!&quot;));</span>
+<span class="fc" id="L97">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>exam-service (21 Dec 2024 10:48:12 am)</div></body></html>

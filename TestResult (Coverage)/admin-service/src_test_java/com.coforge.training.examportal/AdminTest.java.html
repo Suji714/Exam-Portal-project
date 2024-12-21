@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>AdminTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">admin-service (20 Dec 2024 10:52:56 am)</a> &gt; <a href="../../index.html" class="el_group">admin-service</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.coforge.training.examportal</a> &gt; <span class="el_source">AdminTest.java</span></div><h1>AdminTest.java</h1><pre class="source lang-java linenums">package com.coforge.training.examportal;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.coforge.training.examportal.controller.AdminController;
+import com.coforge.training.examportal.service.AdminService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="fc" id="L23">class AdminTest {</span>
+
+    @Mock
+    private AdminService adminService;
+
+    @InjectMocks
+    private AdminController adminController;
+
+    @BeforeEach
+    void setUp() throws Exception {
+<span class="fc" id="L33">        MockitoAnnotations.openMocks(this);</span>
+<span class="fc" id="L34">    }</span>
+
+    @AfterEach
+    void tearDown() throws Exception {
+        // Cleanup resources if needed
+<span class="fc" id="L39">    }</span>
+
+    @Test
+    void testAddQuestions() {
+<span class="fc" id="L43">        MultipartFile file = new MockMultipartFile(&quot;file&quot;, &quot;questions.txt&quot;, &quot;text/plain&quot;, &quot;Sample content&quot;.getBytes());</span>
+
+<span class="fc" id="L45">        doNothing().when(adminService).addQuestions(any(MultipartFile.class));</span>
+
+<span class="fc" id="L47">        ResponseEntity&lt;String&gt; response = adminController.addQuestions(file);</span>
+
+<span class="fc" id="L49">        assertEquals(HttpStatus.OK, response.getStatusCode());</span>
+<span class="fc" id="L50">        assertEquals(&quot;Questions uploaded successfully!&quot;, response.getBody());</span>
+
+<span class="fc" id="L52">        verify(adminService, times(1)).addQuestions(any(MultipartFile.class));</span>
+<span class="fc" id="L53">    }</span>
+
+    @Test
+    void testAddQuestionsError() {
+<span class="fc" id="L57">        MultipartFile file = new MockMultipartFile(&quot;file&quot;, &quot;questions.txt&quot;, &quot;text/plain&quot;, &quot;Sample content&quot;.getBytes());</span>
+
+<span class="fc" id="L59">        doThrow(new RuntimeException(&quot;File upload error&quot;)).when(adminService).addQuestions(any(MultipartFile.class));</span>
+
+<span class="fc" id="L61">        ResponseEntity&lt;String&gt; response = adminController.addQuestions(file);</span>
+
+<span class="fc" id="L63">        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());</span>
+<span class="fc" id="L64">        assertEquals(&quot;Error: File upload error&quot;, response.getBody());</span>
+
+<span class="fc" id="L66">        verify(adminService, times(1)).addQuestions(any(MultipartFile.class));</span>
+<span class="fc" id="L67">    }</span>
+
+    @Test
+    void testRemoveQuestions() {
+<span class="fc" id="L71">        String topic = &quot;Math&quot;;</span>
+
+<span class="fc" id="L73">        doNothing().when(adminService).removeQuestionsByTopic(topic);</span>
+
+<span class="fc" id="L75">        ResponseEntity&lt;String&gt; response = adminController.removeQuestions(topic);</span>
+
+<span class="fc" id="L77">        assertEquals(HttpStatus.OK, response.getStatusCode());</span>
+<span class="fc" id="L78">        assertEquals(&quot;Questions for topic '&quot; + topic + &quot;' removed successfully!&quot;, response.getBody());</span>
+
+<span class="fc" id="L80">        verify(adminService, times(1)).removeQuestionsByTopic(topic);</span>
+<span class="fc" id="L81">    }</span>
+
+    @Test
+    void testViewReports() {
+<span class="fc" id="L85">        List&lt;Object[]&gt; mockReports = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L86">        mockReports.add(new Object[]{1L, &quot;John&quot;, &quot;Doe&quot;, 85});</span>
+<span class="fc" id="L87">        mockReports.add(new Object[]{2L, &quot;Jane&quot;, &quot;Smith&quot;, 90});</span>
+
+<span class="fc" id="L89">        when(adminService.viewUserReports(null, null)).thenReturn(mockReports);</span>
+
+<span class="fc" id="L91">        List&lt;Object[]&gt; reports = adminController.viewReports(null, null);</span>
+
+<span class="fc" id="L93">        assertEquals(2, reports.size());</span>
+<span class="fc" id="L94">        assertEquals(&quot;John&quot;, reports.get(0)[1]);</span>
+<span class="fc" id="L95">        assertEquals(&quot;Jane&quot;, reports.get(1)[1]);</span>
+
+<span class="fc" id="L97">        verify(adminService, times(1)).viewUserReports(null, null);</span>
+<span class="fc" id="L98">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>admin-service (20 Dec 2024 10:52:56 am)</div></body></html>

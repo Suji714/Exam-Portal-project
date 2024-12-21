@@ -8,13 +8,13 @@
 		<version>3.4.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
+	<groupId>com.coforge.training</groupId>
 	<artifactId>apigateway-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>apigateway-server</name>
-	<description>api gateway for microservices</description>
+	<name>apigateway-service</name>
+	<description>API Gateway service to route request to microservices</description>
 	<url/>
-<licenses>
+	<licenses>
 		<license/>
 	</licenses>
 	<developers>
@@ -39,7 +39,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
- 
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -63,7 +63,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
- 
+
 	<build>
 		<plugins>
 			<plugin>
@@ -82,4 +82,5 @@
 			</snapshots>
 		</repository>
 	</repositories>
+
 </project>

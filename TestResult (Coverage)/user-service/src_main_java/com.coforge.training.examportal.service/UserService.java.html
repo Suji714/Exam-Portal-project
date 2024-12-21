@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">UserServiceTest1 (20 Dec 2024 4:11:06 pm)</a> &gt; <a href="../../index.html" class="el_group">user-service</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">com.coforge.training.examportal.service</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package com.coforge.training.examportal.service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.coforge.training.examportal.model.AnswerRequest;
+import com.coforge.training.examportal.model.ExamQuestion;
+import com.coforge.training.examportal.model.User;
+import com.coforge.training.examportal.model.UserScore;
+import com.coforge.training.examportal.repository.UserRepository;
+import com.coforge.training.examportal.repository.UserScoreRepository;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private ExamServiceFeignClient examServiceFeignClient;
+
+    @Autowired
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserScoreRepository userScoreRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+<span class="nc" id="L34">    public UserService(ExamServiceFeignClient examServiceFeignClient, PasswordEncoder passwordEncoder,</span>
+                       UserRepository userRepository) {
+<span class="nc" id="L36">        this.examServiceFeignClient = examServiceFeignClient;</span>
+<span class="nc" id="L37">        this.passwordEncoder = passwordEncoder;</span>
+<span class="nc" id="L38">        this.userRepository = userRepository;</span>
+<span class="nc" id="L39">    }</span>
+
+    // to save the user details with password encryption
+    public void saveUser(User user) throws Exception {
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (userRepository.existsByEmail(user.getEmail())) {</span>
+<span class="nc" id="L44">            throw new Exception(&quot;Email already exists&quot;);</span>
+        }
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (userRepository.existsByMobile(user.getMobile())) {</span>
+<span class="nc" id="L47">            throw new Exception(&quot;Mobile number already exists&quot;);</span>
+        }
+<span class="nc" id="L49">        user.setPassword(passwordEncoder.encode(user.getPassword()));</span>
+<span class="nc" id="L50">        userRepository.save(user);</span>
+<span class="nc" id="L51">    }</span>
+
+    /**
+     * Validate user answers, calculate score, and store it.
+     */
+    public int calculateAndStoreScore(Long userId, String topic, List&lt;AnswerRequest&gt; answers) {
+<span class="nc" id="L57">        List&lt;ExamQuestion&gt; questions = examServiceFeignClient.getQuestionsByTopic(topic);</span>
+
+        // Map question IDs to correct options
+<span class="nc" id="L60">        Map&lt;Long, String&gt; correctOptions = questions.stream()</span>
+<span class="nc" id="L61">                .collect(Collectors.toMap(ExamQuestion::getQuestionId, ExamQuestion::getCorrectAnswer));</span>
+
+<span class="nc" id="L63">        int totalScore = 0;</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        for (AnswerRequest answer : answers) {</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">            if (correctOptions.containsKey(answer.getQuestionId()) &amp;&amp;</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">                    correctOptions.get(answer.getQuestionId()).equalsIgnoreCase(answer.getSelectedOption())) {</span>
+<span class="nc" id="L67">                totalScore++; // Increment score for correct answers</span>
+            }
+        }
+
+<span class="nc" id="L71">        saveUserScore(userId, topic, totalScore);</span>
+<span class="nc" id="L72">        return totalScore;</span>
+    }
+
+    /**
+     * Save or update user score.
+     */
+    private void saveUserScore(Long userId, String topic, int score) {
+<span class="nc" id="L79">        Optional&lt;UserScore&gt; existingScore = userScoreRepository.findByUserIdAndTopic(userId, topic);</span>
+        UserScore userScore;
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (existingScore.isPresent()) {</span>
+<span class="nc" id="L82">            userScore = existingScore.get();</span>
+<span class="nc" id="L83">            userScore.setScore(score);</span>
+<span class="nc" id="L84">        } else {</span>
+<span class="nc" id="L85">            userScore = new UserScore();</span>
+<span class="nc" id="L86">            userScore.setUserId(userId);</span>
+<span class="nc" id="L87">            userScore.setTopic(topic);</span>
+<span class="nc" id="L88">            userScore.setScore(score);</span>
+        }
+<span class="nc" id="L90">        userScoreRepository.save(userScore);</span>
+<span class="nc" id="L91">    }</span>
+
+    // for admin to fetch all user details with marks
+    public List&lt;Object[]&gt; getUserReports(Long userId, String firstname) {
+<span class="nc" id="L95">        return userRepository.fetchUserReports(userId, firstname);</span>
+    }
+
+    /**
+     * Retrieve all scores for a user across all topics.
+     */
+    public List&lt;UserScore&gt; getUserScores(Long userId) {
+<span class="nc" id="L102">        return userScoreRepository.findByUserId(userId);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>UserServiceTest1 (20 Dec 2024 4:11:06 pm)</div></body></html>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>AdminService.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">admin-service (20 Dec 2024 10:52:56 am)</a> &gt; <a href="../../index.html" class="el_group">admin-service</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">com.coforge.training.examportal.service</a> &gt; <span class="el_source">AdminService.java</span></div><h1>AdminService.java</h1><pre class="source lang-java linenums">package com.coforge.training.examportal.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+@Service
+<span class="nc" id="L11">public class AdminService {</span>
+
+	@Autowired
+	private ExamServiceFeignClient examServiceFeignClient;
+
+	@Autowired
+	private UserServiceClient userServiceClient;
+
+	/**
+	 * Add questions to the ExamService.
+	 */
+	public void addQuestions(MultipartFile file) {
+<span class="nc" id="L23">		examServiceFeignClient.addQuestions(file);</span>
+<span class="nc" id="L24">	}</span>
+
+	/**
+	 * Remove questions by topic in the ExamService.
+	 */
+	public void removeQuestionsByTopic(String topic) {
+<span class="nc" id="L30">		examServiceFeignClient.removeQuestionsByTopic(topic);</span>
+<span class="nc" id="L31">	}</span>
+
+	/**
+	 * View reports of all Users by admin
+	 */
+	public List&lt;Object[]&gt; viewUserReports(Long userId, String firstname) {
+<span class="nc" id="L37">		return userServiceClient.fetchUserReports(userId, firstname);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>admin-service (20 Dec 2024 10:52:56 am)</div></body></html>
