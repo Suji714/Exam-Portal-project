@@ -16,6 +16,10 @@ public class AdminService {
 	@Autowired
 	private UserServiceClient userServiceClient;
 
+
+
+
+
 	/**
 	 * Add questions to the ExamService.
 	 */
@@ -33,7 +37,10 @@ public class AdminService {
 	/**
 	 * View reports of all Users by admin
 	 */
-	public List<Object[]> viewUserReports(Long userId, String firstname) {
-		return userServiceClient.fetchUserReports(userId, firstname);
+
+	public ResponseEntity<List<Object[]>> getUserReports(Long userId, String firstname) {
+		return userServiceClient.getUserReports(userId, firstname);
 	}
 }
+
+

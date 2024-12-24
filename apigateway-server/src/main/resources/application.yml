@@ -1,0 +1,33 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: http://localhost:8083 # Update with your User Service URL
+          predicates:
+            - Path=/api/user/**
+        - id: admin-service
+          uri: http://localhost:8086 # Update with your Admin Service URL
+          predicates:
+            - Path=/api/admin/**
+        - id: exam-service
+          uri: http://localhost:8084 # Update with your Exam Service URL
+          predicates:
+            - Path=/api/exam/**
+        
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:4200"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+server:
+  port: 8888

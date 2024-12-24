@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.coforge.training.examportal.service.AdminService;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -51,10 +50,10 @@ public class AdminController {
 	
 	  // Endpoint for admin to view reports
     @GetMapping("/view-reports")
-    public List<Object[]> viewReports(
+    public ResponseEntity<List<Object[]>> viewReports(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String firstname) {
-        return adminService.viewUserReports(userId, firstname);
+        return adminService.getUserReports(userId, firstname);
     }
    
 }

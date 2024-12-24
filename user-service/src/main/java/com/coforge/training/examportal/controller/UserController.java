@@ -24,7 +24,6 @@ import com.coforge.training.examportal.model.UserScore;
 import com.coforge.training.examportal.repository.UserRepository;
 import com.coforge.training.examportal.service.UserService;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/user")
 public class UserController {

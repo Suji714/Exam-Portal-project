@@ -86,14 +86,14 @@ class AdminTest {
         mockReports.add(new Object[]{1L, "John", "Doe", 85});
         mockReports.add(new Object[]{2L, "Jane", "Smith", 90});
 
-        when(adminService.viewUserReports(null, null)).thenReturn(mockReports);
+        when(adminService.getUserReports(null, null)).thenReturn((ResponseEntity<List<Object[]>>) mockReports);
 
-        List<Object[]> reports = adminController.viewReports(null, null);
+        List<Object[]> reports = (List<Object[]>) adminController.viewReports(null, null);
 
         assertEquals(2, reports.size());
         assertEquals("John", reports.get(0)[1]);
         assertEquals("Jane", reports.get(1)[1]);
 
-        verify(adminService, times(1)).viewUserReports(null, null);
+        verify(adminService, times(1)).getUserReports(null, null);
     }
 }

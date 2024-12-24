@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.coforge.training.examportal.model.ExamQuestion;
 import com.coforge.training.examportal.service.ExamService;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/exam")
 public class ExamController {
