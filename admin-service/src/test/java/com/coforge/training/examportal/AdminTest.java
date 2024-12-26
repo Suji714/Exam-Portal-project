@@ -1,7 +1,12 @@
 package com.coforge.training.examportal;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,10 +91,13 @@ class AdminTest {
         mockReports.add(new Object[]{1L, "John", "Doe", 85});
         mockReports.add(new Object[]{2L, "Jane", "Smith", 90});
 
-        when(adminService.getUserReports(null, null)).thenReturn((ResponseEntity<List<Object[]>>) mockReports);
+        ResponseEntity<List<Object[]>> responseEntity = new ResponseEntity<>(mockReports, HttpStatus.OK);
+        when(adminService.getUserReports(null, null)).thenReturn(responseEntity);
 
-        List<Object[]> reports = (List<Object[]>) adminController.viewReports(null, null);
+        ResponseEntity<List<Object[]>> response = adminController.viewReports(null, null);
 
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<Object[]> reports = response.getBody();
         assertEquals(2, reports.size());
         assertEquals("John", reports.get(0)[1]);
         assertEquals("Jane", reports.get(1)[1]);

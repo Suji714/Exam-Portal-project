@@ -1,6 +1,6 @@
 package com.coforge.training.examportal;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,9 +25,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.coforge.training.examportal.controller.UserController;
@@ -34,8 +37,8 @@ import com.coforge.training.examportal.model.AnswerRequest;
 import com.coforge.training.examportal.model.User;
 import com.coforge.training.examportal.model.UserScore;
 import com.coforge.training.examportal.repository.UserRepository;
+import com.coforge.training.examportal.service.UserScoreService;
 import com.coforge.training.examportal.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /*
@@ -53,6 +56,10 @@ class UserServiceTest1 {
 
     @Mock
     private UserRepository userRepository;
+    
+    @Mock
+    private UserScoreService userScoreService;
+
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -214,5 +221,29 @@ class UserServiceTest1 {
 
 	        verify(userService, times(1)).getUserScores(userId);
 	    }
+	
+	 @Test
+	    void testDownloadUserScorePdf() throws Exception {
+	        Long userId = 1L;
+
+	        // Prepare the PDF content
+	        ByteArrayInputStream bis = new ByteArrayInputStream("Sample PDF Content".getBytes());
+	        
+	        // Mock the service call
+	        when(userScoreService.generateUserScorePdf(userId)).thenReturn(bis);
+
+	        MvcResult result = mockMvc.perform(get("/api/user/score/{userId}/download", userId))
+	                .andExpect(status().isOk())
+	                .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+	                .andReturn();
+
+	        // Verify the content-disposition header
+	        String contentDisposition = result.getResponse().getHeader(HttpHeaders.CONTENT_DISPOSITION);
+	        assertTrue(contentDisposition.contains("attachment; filename=UserScore.pdf"));
+
+	        // Verify the service call
+	        verify(userScoreService, times(1)).generateUserScorePdf(userId);
+	    }
+
 	}
 
