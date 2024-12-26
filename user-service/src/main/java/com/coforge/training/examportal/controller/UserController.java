@@ -1,15 +1,17 @@
 package com.coforge.training.examportal.controller;
 
+import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +24,7 @@ import com.coforge.training.examportal.model.AnswerRequest;
 import com.coforge.training.examportal.model.User;
 import com.coforge.training.examportal.model.UserScore;
 import com.coforge.training.examportal.repository.UserRepository;
+import com.coforge.training.examportal.service.UserScoreService;
 import com.coforge.training.examportal.service.UserService;
 
 @RestController
@@ -36,6 +39,9 @@ public class UserController {
 	 
 	 @Autowired
 	 private PasswordEncoder passwordEncoder;
+	 
+	 @Autowired
+	    private UserScoreService userScoreService;
 	 
 	 //registering the user
 	    @PostMapping("/register")
@@ -97,5 +103,17 @@ public class UserController {
 	        return ResponseEntity.ok(userScores);
 	    }
 	 
-	    
+	    @GetMapping("/score/{userId}/download")
+	    public ResponseEntity<byte[]> downloadUserScorePdf(@PathVariable Long userId) {
+	        ByteArrayInputStream bis = userScoreService.generateUserScorePdf(userId);
+
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=UserScore.pdf");
+
+	        return ResponseEntity.ok()
+	                .headers(headers)
+	                .contentType(MediaType.APPLICATION_PDF)
+	                .body(bis.readAllBytes());
+	    }
+
 }
